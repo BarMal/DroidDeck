@@ -306,6 +306,8 @@ jobs:
           persist-credentials: false
 
       - name: Check human authorship
+        # Fork policy: only enforced on the upstream repository.
+        if: ${{ github.repository == 'Droid-Deck/DroidDeck' }}
         env:
           EVENT_NAME: ${{ github.event_name }}
           BEFORE: ${{ github.event.before }}
