@@ -97,4 +97,20 @@ class GpuDetectionTest {
         assertEquals(0, GpuInfo.platformModel("exynos2400"))
         assertEquals(0, GpuInfo.platformModel(" kona "))
     }
+
+    @Test fun maliIsExperimentalAndNeverAdreno() {
+        val mali = GpuInfo(name = "Mali-G615", model = 0, family = Family.MALI, soc = "", oneUi8Gen2 = false)
+        assertEquals(Support.UNTESTED, mali.support)
+        assertEquals(false, mali.isAdreno)
+        assertEquals(true, info(true, 740).isAdreno)
+        assertEquals(false, info(false, 0).isAdreno)
+    }
+
+    @Test fun maliNameComesFromTheVulkanDevice() {
+        assertEquals("Mali-G615 MC6", GpuInfo.maliName { "Mali-G615 MC6" })
+        assertEquals("Mali-G615", GpuInfo.maliName { "Mali-G615 (Panfrost)" })
+        assertEquals("Mali-G720-Immortalis MC12", GpuInfo.maliName { "Mali-G720-Immortalis MC12" })
+        assertEquals("Mali", GpuInfo.maliName { null })
+        assertEquals("Mali", GpuInfo.maliName { "llvmpipe" })
+    }
 }

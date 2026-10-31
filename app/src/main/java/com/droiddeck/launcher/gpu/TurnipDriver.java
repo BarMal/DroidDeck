@@ -292,8 +292,8 @@ public final class TurnipDriver {
         String quest = QuestExperimental.INSTANCE.defaultAndroidDriver();
         if (quest != null) return quest;
         GpuInfo gpu = gpuDetector.get();
-        if (gpu.getFamily() == GpuInfo.Family.NOT_ADRENO) {
-            Log.i(TAG, "not an Adreno GPU; leaving the display driver to the system");
+        if (!gpu.isAdreno()) {
+            Log.i(TAG, "not an Adreno GPU (" + gpu.getFamily() + "); leaving the display driver to the system");
             return null;
         }
         int model = gpu.getModel();

@@ -2110,6 +2110,7 @@
     <string name="gpuinfo_experimental">Experimental: its drivers are test builds</string>
     <string name="gpuinfo_a850_experimental">Experimental Adreno 850 support: requires compatible experimental display and game drivers; not verified on this device</string>
     <string name="gpuinfo_below_tested">Below tested hardware (Adreno 725 and newer): it may not run</string>
+    <string name="gpuinfo_mali_experimental">Experimental Mali support: import a PanVK glibc driver (libvulkan_panfrost) as the Linux runtime driver</string>
     <string name="gpuinfo_unsupported">Not supported: DroidDeck needs an Adreno (Snapdragon) GPU</string>
 
     <string name="turnip_rate_limited">GitHub\'s rate limit was hit - try again later</string>
@@ -3333,6 +3334,7 @@
     <string name="session_end_steam_sigill">Steam stopped with an illegal instruction (SIGILL). This can be a CPU instruction compatibility problem or a client crash. Share the logs with your device details.</string>
     <string name="session_end_steam_try_x64">You can try Steam settings → Steam client → x86-64 (experimental). It needs an additional download and may run more slowly.</string>
     <string name="session_end_vulkan_device">The Linux graphics driver could not find a usable Vulkan device. Check that the selected Linux GPU driver supports this GPU.</string>
+    <string name="session_end_mali_driver">No Vulkan device was found for this Mali GPU. Import a PanVK glibc driver (libvulkan_panfrost-glibc-aarch64.so from the panvk-kbase-android releases) under GPU drivers as the Linux runtime driver, then start the session again.</string>
     <string name="session_end_gpu_unsupported">This session cannot start because this GPU has no compatible Linux Vulkan driver in the current setup. Adreno Turnip drivers cannot enable support for MediaTek/Mali GPUs.</string>
     <string name="setup_group_memory">Memory</string>
     <string name="setup_clear_cached">Clear cached apps before a session</string>

@@ -87,6 +87,13 @@ class SessionEndHintTest {
     }
 
     @Test
+    fun vulkanFailureOnMaliPointsAtThePanVkDriver() {
+        DetectedGpu.family = GpuInfo.Family.MALI
+
+        assertEquals(activity.getString(R.string.session_end_mali_driver), hintText(vulkanLog()))
+    }
+
+    @Test
     fun missingEmptyAndUnrelatedLogsHaveNoHint() {
         assertNull(hint(null))
         assertNull(hint(File(temporary.root, "missing.log")))
