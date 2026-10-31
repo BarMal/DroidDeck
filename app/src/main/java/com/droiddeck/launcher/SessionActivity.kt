@@ -2442,8 +2442,12 @@ class SessionActivity : ComponentActivity(), SurfaceHolder.Callback {
                 val fallback = if (SessionState.steamClientArch == "arm64") getString(R.string.session_end_steam_try_x64) else null
                 EndHint(listOfNotNull(message, fallback).joinToString("\n"))
             } else if (launchFailure == com.droiddeck.launcher.session.SessionLaunchFailure.VULKAN_DEVICE_MISSING) {
-                val adreno = com.droiddeck.launcher.gpu.GpuInfo.detect().family != com.droiddeck.launcher.gpu.GpuInfo.Family.NOT_ADRENO
-                EndHint(getString(if (adreno) R.string.session_end_vulkan_device else R.string.session_end_gpu_unsupported))
+                val family = com.droiddeck.launcher.gpu.GpuInfo.detect().family
+                EndHint(getString(when (family) {
+                    com.droiddeck.launcher.gpu.GpuInfo.Family.NOT_ADRENO -> R.string.session_end_gpu_unsupported
+                    com.droiddeck.launcher.gpu.GpuInfo.Family.MALI -> R.string.session_end_mali_driver
+                    else -> R.string.session_end_vulkan_device
+                }))
             } else if (fexMissing) {
                 val what = com.droiddeck.launcher.frontend.Library.nameForProgram(SessionState.program) ?: getString(R.string.session_end_program)
                 EndHint(getString(R.string.session_end_fex_missing, what), evenOnSuccess = true)

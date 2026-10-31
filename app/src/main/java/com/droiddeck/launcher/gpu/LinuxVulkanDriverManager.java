@@ -93,12 +93,30 @@ public class LinuxVulkanDriverManager {
         FileUtils.delete(getDriverDir(id));
     }
 
+    static boolean isVulkanLibrary(String base) {
+        return base.startsWith("libvulkan_") && base.endsWith(".so");
+    }
+
+    static boolean startsWithElf(byte[] head, int n) {
+        return n >= 4 && head[0] == 0x7f && head[1] == 'E' && head[2] == 'L' && head[3] == 'F';
+    }
+
     public String installDriver(Uri zipUri, String displayName) throws IOException {
         File tmpDir = newStagingDir();
         boolean keep = false;
         try {
             String soName = null;
             JSONObject zipMeta = null;
+            if (isBareLibrary(zipUri)) {
+                try (InputStream is = context.getContentResolver().openInputStream(zipUri)) {
+                    if (is == null) throw new IOException("cannot open " + zipUri);
+                    Files.copy(is, new File(tmpDir, LIB_NAME).toPath(), StandardCopyOption.REPLACE_EXISTING);
+                }
+                soName = displayName != null && !displayName.isEmpty() ? displayName : "libvulkan.so";
+                String id = adopt(tmpDir, soName, null, stripSo(soName));
+                keep = true;
+                return id;
+            }
             try (InputStream is = context.getContentResolver().openInputStream(zipUri);
                  ZipInputStream zis = new ZipInputStream(is)) {
                 if (is == null) throw new IOException("cannot open " + zipUri);
@@ -107,8 +125,8 @@ public class LinuxVulkanDriverManager {
                     if (entry.isDirectory()) continue;
                     String base = new File(entry.getName()).getName();
                     if (base.isEmpty()) continue;
-                    if (base.startsWith("libvulkan_freedreno") && base.endsWith(".so")) {
-                        if (soName != null) Log.w(TAG, "zip has several libvulkan_freedreno*.so; using the first (" + soName + ")");
+                    if (isVulkanLibrary(base)) {
+                        if (soName != null) Log.w(TAG, "zip has several libvulkan_*.so; using the first (" + soName + ")");
                         else {
                             Files.copy(zis, new File(tmpDir, LIB_NAME).toPath(), StandardCopyOption.REPLACE_EXISTING);
                             soName = base;
@@ -128,6 +146,24 @@ public class LinuxVulkanDriverManager {
         } finally {
             if (!keep) FileUtils.delete(tmpDir);
         }
+    }
+
+    public boolean isBareLibrary(Uri uri) throws IOException {
+        try (InputStream is = context.getContentResolver().openInputStream(uri)) {
+            if (is == null) throw new IOException("cannot open " + uri);
+            byte[] head = new byte[4];
+            int n = 0;
+            while (n < head.length) {
+                int r = is.read(head, n, head.length - n);
+                if (r < 0) break;
+                n += r;
+            }
+            return startsWithElf(head, n);
+        }
+    }
+
+    private static String stripSo(String name) {
+        return name.endsWith(".so") ? name.substring(0, name.length() - 3) : name;
     }
 
     File newStagingDir() throws IOException {

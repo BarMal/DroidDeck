@@ -396,6 +396,8 @@ internal class DriverMenus(private val activity: Activity, private val ui: Handl
             val problem = try {
                 when {
                     DriverBundle.isBundle(activity, uri) -> bundle = DriverBundle.install(activity, uri)
+                    linux != false && LinuxVulkanDriverManager(activity).isBareLibrary(uri) ->
+                        LinuxVulkanDriverManager(activity).installDriver(uri, name)
                     linux == true -> LinuxVulkanDriverManager(activity).installDriver(uri, name)
                     linux == false -> TurnipDriver(activity).installFromZip(uri, name)
                     else -> try {
